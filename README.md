@@ -119,9 +119,7 @@ For dataset integration, model retraining, or SIH presentation materials (PPT/sc
 📧 Email: pratikagarwal298@gmail.com
 
 🐳 Deployment (Docker)
-# Clone repository
-git clone https://github.com/yourusername/cropiq.git
-cd cropiq
+
 
 # Build and run
 docker-compose up --build
