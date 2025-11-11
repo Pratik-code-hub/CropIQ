@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CropInsights Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--accent-green:#22c55e;--accent-blue:#3b82f6;--accent-cyan:#06b6d4;--muted:#94a3b8;--card-bg: rgba(255,255,255,0.06);--glass-border: rgba(255,255,255,0.08);--text-light: #e6f7f3;--card-radius:14px;--max-w:1200px;}
+body{margin:0;font-family:Inter,system-ui;-webkit-font-smoothing:antialiased;background:#0f2027;color:var(--text-light);}
+.container{max-width:var(--max-w);margin:18px auto;padding:18px;}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background: rgba(255,255,255,0.03);border-radius:10px;border:1px solid var(--glass-border);}
+.brand{font-weight:700;}
+.nav-links{display:flex;gap:14px;}
+.nav-links a{color:var(--text-light);text-decoration:none;font-weight:600;padding:6px 10px;border-radius:8px;transition:background .16s,color .16s;}
+.nav-links a:hover{background: rgba(255,255,255,0.02);color: var(--accent-cyan);}
+h1{font-size:1.6rem;margin:0;font-weight:800;background: linear-gradient(90deg, var(--accent-green), var(--accent-blue), var(--accent-cyan)); -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.subtitle{color:#cfeefc;margin:6px 0 0;font-size:0.95rem;}
+.grid{display:grid;gap:12px;}
+.grid-3{grid-template-columns: repeat(3, 1fr);}
+.card{background: var(--card-bg); border-radius: var(--card-radius); padding: 16px; border: 1px solid var(--glass-border); box-shadow: 0 10px 28px rgba(2,8,23,0.45); cursor:pointer; transition: transform .2s;}
+.card:hover{transform: translateY(-6px); box-shadow:0 18px 42px rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.14);}
+.btn{background: linear-gradient(90deg, var(--accent-green), var(--accent-blue), var(--accent-cyan));padding:8px 14px;border-radius:10px;border:none;font-weight:700;color:#042017;cursor:pointer;}
+.btn:hover{transform:scale(1.03);box-shadow:0 10px 24px rgba(34,197,94,0.12);}
+.chart-wrap{height:300px;margin-top:8px;}
+canvas{display:block;width:100% !important;}
+table{width:100%;border-collapse:collapse;color:#e6f7ee;margin-top:8px;font-size:0.92rem;}
+th,td{padding:8px;border-bottom:1px dashed rgba(255,255,255,0.03);}
+th{font-weight:700;color:#cfeefc;text-align:left;}
+#districtImage{margin-top:12px;width:100%;max-height:250px;object-fit:cover;border-radius:10px;display:none;}
+.footer{margin-top:20px;color:var(--muted);font-size:0.9rem;text-align:center;}
+</style>
+</head>
+<body>
+<div class="container">
+<nav class="nav">
+<div class="brand"><span class="badge">AI Crop Yield</span></div>
+<div class="nav-links">
+<a href="index.html">Home</a>
+<a href="predict.html">Predict</a>
+<a href="optimize.html">Optimize</a>
+</div>
+</nav>
+
+<header>
+<h1>Dashboard — CropInsights</h1>
+<p class="subtitle">AI-Powered Crop Yield Prediction & Optimization — Project </p>
+</header>
+
+<div class="grid grid-3">
+<div class="card"><h3>Avg Yield (t/ha)</h3><div id="avgYield">--</div></div>
+<div class="card"><h3>Rainfall Adequacy</h3><div id="rainAde">--</div></div>
+<div class="card"><h3>Median Profit</h3><div id="medProfit">--</div></div>
+</div>
+
+<div class="grid" style="grid-template-columns:2fr 1fr; gap:12px;margin-top:12px;align-items:start;">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;">
+<h3>District / Crop Yield Comparison</h3>
+<button id="refreshBtn" class="btn">Refresh</button>
+</div>
+<div class="chart-wrap"><canvas id="barYield"></canvas></div>
+
+<div style="display:flex; gap:12px;margin-top:12px;">
+<div style="flex:1" class="card">
+<h4>Risk Share</h4>
+<canvas id="pieRisk" height="160"></canvas>
+</div>
+<div style="flex:1" class="card">
+<h4>Historical Trends</h4>
+<canvas id="lineHist1" height="160"></canvas>
+<canvas id="lineHist2" height="160" style="margin-top:12px"></canvas>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Alerts</h3>
+<table>
+<thead><tr><th>Date</th><th>District</th><th>Type</th><th>Message</th></tr></thead>
+<tbody id="alertsBody"></tbody>
+</table>
+<img id="districtImage" src="" alt="District Image">
+<button id="downloadPDF" class="btn" style="margin-top:10px;">📄 Download PDF Report</button>
+</div>
+
+<footer class="footer">
+Built for: Government of Agriculture, FoodTech & Rural Development by Pratik Kumar.
+</footer>
+</div>
+
+ <footer style="margin-top:32px">
+    <!--  <p class="small">Expand datasets & models for production. Replace <code>backend/crop_history.csv</code> with real field & satellite data to improve accuracy.</p>  -->
+      <p style="margin-top:10px">&copy; Pratik Kumar</p>
+    </footer>
+<script>
+const districts = ['Rupnagar','Ludhiana','Amritsar','Jalandhar'];
+let districtIndex = 0;
+
+function getRandomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+
+function generateDashboardData(){
+return {
+avgYield:(2+Math.random()).toFixed(2),
+rainAde:getRandomInt(60,95),
+medProfit:getRandomInt(15000,25000),
+alerts:[
+{date:'21-Sep', district:'Rupnagar', type:'Info', msg:'💧 Optimal irrigation reached', img:'SIH/istockphoto-1183764755-612x612.jpg'},
+{date:'22-Sep', district:'Ludhiaana', type:'Warning', msg:'🌱 Low nitrogen detected', img:''},
+{date:'23-Sep', district:'Amritsar', type:'Critical', msg:'🐛 Pest outbreak detected', img:'https://via.placeholder.com/600x250?text=District+3'},
+{date:'24-Sep', district:'Jalandhar', type:'Warning', msg:'🌧 Excess rainfall', img:'https://via.placeholder.com/600x250?text=District+4'},
+{date:'25-Sep', district:'Rupnagar', type:'Info', msg:'🧪 Fertilizer applied', img:'https://via.placeholder.com/600x250?text=District+1'}
+],
+barData:[getRandomInt(2,3),getRandomInt(2,3),getRandomInt(2,3),getRandomInt(2,3)],
+pieData:[getRandomInt(30,50),getRandomInt(20,40),getRandomInt(10,30)],
+lineData1:[2.0,2.1,2.3,2.2,2.4,2.5,2.6,2.7], // Jan → Aug
+lineData2:[15000,18000,17000,19000,20000,21000,22000,23000] // Profit ₹
+};
+}
+
+let dashboardData = generateDashboardData();
+
+function renderDashboard(data){
+document.getElementById('avgYield').innerText=data.avgYield;
+document.getElementById('rainAde').innerText=data.rainAde+'%';
+document.getElementById('medProfit').innerText='₹'+data.medProfit.toLocaleString();
+
+// Render Alerts
+const alertsBody=document.getElementById('alertsBody');
+alertsBody.innerHTML='';
+data.alerts.forEach(a=>{
+let row=document.createElement('tr');
+row.innerHTML=`<td>${a.date}</td><td class="district" data-img="${a.img}">${a.district}</td><td>${a.type}</td><td>${a.msg}</td>`;
+alertsBody.appendChild(row);
+});
+
+// Charts
+const barCtx=document.getElementById('barYield').getContext('2d');
+if(window.barChart) window.barChart.destroy();
+window.barChart=new Chart(barCtx,{type:'bar',data:{labels:districts,datasets:[{label:'Yield (t/ha)',data:data.barData,backgroundColor:'rgba(34,197,94,0.7)'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+
+const pieCtx=document.getElementById('pieRisk').getContext('2d');
+if(window.pieChart) window.pieChart.destroy();
+window.pieChart=new Chart(pieCtx,{type:'pie',data:{labels:['Low','Medium','High'],datasets:[{data:data.pieData,backgroundColor:['#22c55e','#3b82f6','#06b6d4']}]},options:{responsive:true,plugins:{tooltip:{callbacks:{label:function(ctx){return ctx.label+': '+ctx.raw+'%';}}}}}});
+
+// Swap district for historical trends
+let swapDistrict = districts[districtIndex % districts.length];
+districtIndex++;
+
+const lineCtx1=document.getElementById('lineHist1').getContext('2d');
+if(window.lineChart1) window.lineChart1.destroy();
+window.lineChart1=new Chart(lineCtx1,{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'],datasets:[{label:`Yield t/ha - ${swapDistrict}`,data:data.lineData1,borderColor:'#22c55e',fill:false,tension:0.2}]},options:{responsive:true,plugins:{legend:{display:true}}}});
+
+const lineCtx2=document.getElementById('lineHist2').getContext('2d');
+if(window.lineChart2) window.lineChart2.destroy();
+window.lineChart2=new Chart(lineCtx2,{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'],datasets:[{label:`Expected Profit ₹ - ${swapDistrict}`,data:data.lineData2,borderColor:'#3b82f6',fill:false,tension:0.2}]},options:{responsive:true,plugins:{tooltip:{callbacks:{label:function(ctx){return 'Profit: ₹'+ctx.raw;}}}}}});
+}
+
+// Initial render
+renderDashboard(dashboardData);
+
+// District image click
+document.addEventListener('click',function(e){
+if(e.target.classList.contains('district')){
+let imgSrc=e.target.getAttribute('data-img');
+let img=document.getElementById('districtImage');
+img.src=imgSrc; img.style.display='block';
+}
+});
+
+// PDF Download
+document.getElementById('downloadPDF').addEventListener('click',()=>{
+const { jsPDF } = window.jspdf;
+const doc=new jsPDF();
+doc.setFontSize(16);
+doc.text("CropInsights Dashboard Report",14,20);
+doc.setFontSize(12);
+doc.text(`Avg Yield: ${dashboardData.avgYield} t/ha`,14,32);
+doc.text(`Rainfall Adequacy: ${dashboardData.rainAde}%`,14,40);
+doc.text(`Median Profit: ₹${dashboardData.medProfit.toLocaleString()}`,14,48);
+doc.text("Alerts:",14,60);
+dashboardData.alerts.forEach((a,i)=>{doc.text(`- ${a.date} ${a.district}: ${a.msg}`,14,68+i*8);});
+doc.save("CropInsights_Report.pdf");
+});
+
+// Refresh button
+document.getElementById('refreshBtn').addEventListener('click',()=>{
+dashboardData=generateDashboardData();
+renderDashboard(dashboardData);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>CropIQ (Smart Farming with Intelligence)</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+  <div class="container">
+    <nav class="nav" aria-label="Main navigation">
+      <div class="brand">
+        <!-- simple leaf icon -->
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="margin-right:8px">
+          <path d="M4 12c3-6 13-6 16 0-3 6-13 6-16 0Z" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        CropIQ <span class="badge"> </span>
+      </div>
+
+      <div class="nav-links" role="navigation" aria-label="Pages">
+        <a href="index.html">Home</a>
+        <a href="predict.html">Predict</a>
+        <a href="optimize.html">Optimize</a>
+        <a href="dashboard.html">Dashboard</a>
+      </div>
+    </nav>
+
+    <header class="hero" style="text-align:left; padding-top:28px;">
+      <h1>About CropIQ — Smart Farming with Intelligence</h1>
+      <p class="small" style="max-width:900px; margin-top:8px;">
+        CropIQ (AgriYield) is a lightweight, production-ready demo that combines historical field data,
+        soil & weather features, and machine learning to provide crop yield predictions, trend analytics,
+        and practical optimization recommendations for irrigation and fertilization.
+      </p>
+    </header>
+
+    <!-- Overview -->
+    <section class="grid" style="margin-top:20px">
+      <div class="card">
+        <h3>Mission</h3>
+        <p class="small">
+          Empower farmers and agri-advisors with actionable, data-driven insights to optimize crop selection,
+          improve yield, and boost profitability while promoting sustainable resource use.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Vision</h3>
+        <p class="small">
+          Build an accessible AI platform for region-specific recommendations — from district-level trends to
+          field-scale irrigation and fertilizer suggestions.
+        </p>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="card" style="margin-top:18px">
+      <h3>How it works</h3>
+      <ol class="small" style="margin-left:18px; line-height:1.7;">
+        <li><strong>Data ingestion:</strong> Historical production, soil tests (pH, N-P-K), weather (temp, rainfall), and farmer inputs are collected.</li>
+        <li><strong>Feature engineering:</strong> We compute area-normalized yields, season flags, and district aggregates to capture spatial & temporal trends.</li>
+        <li><strong>Modeling:</strong> ML models (tree-based regressors / linear models) are trained to predict yield (t/ha) and profitability; time-series trends are used for 1–5 year forecasts.</li>
+        <li><strong>Dashboard & API:</strong> Frontend fetches summaries and predictions from `/api/summary`, `/predict`, and `/api/download_report` to visualize and produce downloadable PDF reports.</li>
+        <li><strong>Optimization:</strong> Rule-based and data-driven recommendations (fertilizer mixes, irrigation schedule) are offered to maximize profitability and minimize risk.</li>
+      </ol>
+    </section>
+
+    <!-- Features -->
+    <section class="grid grid-3" style="margin-top:18px">
+      <a href="predict.html" class="feature-card crop" aria-label="Multi-crop support">
+        <h3>🌱 Multi-crop support</h3>
+        <p class="small">Paddy, Wheat, Maize, Pulses supported in demo. Easily extendable to other crops.</p>
+      </a>
+
+      <a href="dashboard.html" class="feature-card dashboard" aria-label="Dashboard analytics">
+        <h3>📊 Dashboard</h3>
+        <p class="small">District analytics, historical trends, risk indicators and alerts for timely action.</p>
+      </a>
+
+      <a href="optimize.html" class="feature-card optimize" aria-label="Optimization">
+        <h3>⚡ Optimization</h3>
+        <p class="small">Irrigation & fertilizer suggestions, profitability scoring and scenario comparison.</p>
+      </a>
+    </section>
+
+    <!-- Technical details -->
+    <section class="card" style="margin-top:18px">
+      <h3>Technical Stack</h3>
+      <p class="small">
+        Backend: <strong>Python Flask</strong> serving REST APIs, ML models saved with <strong>joblib</strong>.
+        Data processing with <strong>pandas</strong>. Charts via <strong>Chart.js</strong>. PDF reports generated with <strong>ReportLab</strong> and Matplotlib.
+        Dockerfile & docker-compose included for deployment.
+      </p>
+    </section>
+
+    <!-- Team & Contact -->
+    <section class="grid" style="margin-top:18px">
+      <div class="card">
+        <h3>Team</h3>
+        <p class="small">
+          Built by Pratik Kumar — (IBM- AI & ML) ,data analyst, frontend & backend engineers focused on agriculture solutions.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Get in touch</h3>
+        <p class="small">
+          For dataset integration, model retraining or SIH presentation materials (PPT/screenshots), contact:
+        </p>
+        <p class="small" style="margin-top:8px"><strong>Email:</strong> <a href="mailto:pratikkumar207302@gmail.com" style="color:var(--accent2)">pratikagarwal298@gmail.com</a></p>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <div style="display:flex; gap:12px; margin-top:20px; align-items:center;">
+      <a class="btn" href="dashboard.html">Open Dashboard</a>
+      <a class="btn" href="predict.html" style="background:linear-gradient(90deg,#22c55e,#84cc16)">Try Prediction</a>
+      <a class="btn" href="optimize.html" style="background:linear-gradient(90deg,#f59e0b,#f97316)">Open Optimization</a>
+    </div>
+
+    <footer style="margin-top:32px">
+    <!--  <p class="small">Expand datasets & models for production. Replace <code>backend/crop_history.csv</code> with real field & satellite data to improve accuracy.</p>  -->
+      <p style="margin-top:10px">&copy; Pratik Kumar</p>
+    </footer>
+  </div>
+
+  <!-- Optional small script to add active class to clicked feature card for visual feedback -->
+  <script>
+    document.addEventListener('click', function (e) {
+      const card = e.target.closest('.feature-card');
+      if (!card) return;
+      // remove .active from siblings
+      document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      // let natural navigation happen (link will open)
+    });
+  </script>
+</body>
+</html>

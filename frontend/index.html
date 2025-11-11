@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>CropIQ (Smart Farming with Intelligence)</title>
+
+  <!-- keep your existing stylesheet -->
+  <link rel="stylesheet" href="assets/css/style.css"/>
+
+  <!-- small component styles — paste into your CSS if you prefer keeping HTML clean -->
+  <style>
+    :root{
+      --bg-1: #06121a;
+      --bg-2: #07293b;
+      --glass: rgba(255,255,255,0.04);
+      --glass-2: rgba(255,255,255,0.03);
+      --muted: #9fb7c3;
+      --accent: linear-gradient(90deg,#22c55e,#06b6d4);
+      --card-radius: 14px;
+      --card-padding: 18px;
+      --glass-border: rgba(255,255,255,0.06);
+      --green: #10b981;
+      --blue: #3b82f6;
+      --orange: #fb923c;
+      --glass-glow: rgba(34,197,94,0.06);
+    }
+    /* page background + container */
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:
+      radial-gradient(1200px 600px at 10% 10%, rgba(8,32,18,0.7), transparent 8%),
+      linear-gradient(180deg,var(--bg-1),var(--bg-2)); color:#ecf9f1;}
+    .container{max-width:1150px;margin:28px auto;padding:22px}
+
+    /* nav */
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-radius:12px;
+      background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); box-shadow:0 6px 24px rgba(2,6,23,0.6)}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800}
+    .brand svg{filter:drop-shadow(0 4px 8px rgba(0,0,0,0.35))}
+    .nav a{color:var(--muted);text-decoration:none;margin-left:16px;padding:6px 8px;border-radius:8px;transition:all .18s}
+    .nav a:hover{color:#fff;transform:translateY(-3px)}
+
+    /* hero */
+    .hero{padding:48px 12px 34px;text-align:left;display:grid;gap:14px}
+    .hero h1{font-size:2.4rem;margin:0;line-height:1.02;background:linear-gradient(90deg,#7ef4c6,#67e8f9);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .hero p{margin:0;color:var(--muted);max-width:86%}
+    .hero .cta-row{margin-top:8px;display:flex;gap:12px;align-items:center}
+    .btn-cta{background-image:var(--accent);color:#002521;border:none;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer;
+      box-shadow:0 8px 22px rgba(6,78,59,0.12), inset 0 -2px 6px rgba(0,0,0,0.12);text-decoration:none}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:10px 16px;border-radius:12px}
+
+    /* grid cards */
+    .grid{display:grid;gap:18px}
+    .grid-3{grid-template-columns:repeat(3,1fr)}
+    .card{background:var(--glass);padding:var(--card-padding);border-radius:var(--card-radius);border:1px solid var(--glass-border);
+      backdrop-filter: blur(8px);transition:transform .22s, box-shadow .22s}
+    .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(3,7,12,0.6)}
+
+    /* feature clickable cards */
+    .feature-card{display:block;text-decoration:none;color:inherit;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));position:relative;overflow:hidden;box-sizing:border-box}
+    .feature-card .icon{width:46px;height:46px;border-radius:10px;display:inline-grid;place-items:center;margin-bottom:10px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+    .feature-card h3{margin:2px 0 8px;font-size:1.05rem}
+    .feature-card p{margin:0;color:var(--muted);font-size:0.92rem}
+
+    /* colored accents on hover (keeps size stable) */
+    .feature-card.crop:hover{background:linear-gradient(90deg, rgba(16,185,129,0.06), rgba(6,182,212,0.02));box-shadow:0 12px 30px rgba(16,185,129,0.12)}
+    .feature-card.dash:hover{background:linear-gradient(90deg, rgba(59,130,246,0.06), rgba(34,211,238,0.02));box-shadow:0 12px 30px rgba(59,130,246,0.12)}
+    .feature-card.opt:hover{background:linear-gradient(90deg, rgba(251,146,60,0.06), rgba(250,204,21,0.02));box-shadow:0 12px 30px rgba(251,146,60,0.12)}
+
+    /* click / active (blue highlight requested) */
+    .feature-card:active, .feature-card.active{
+      background: linear-gradient(90deg, rgba(59,130,246,0.16), rgba(59,130,246,0.08));
+      color:#06203b; transform: none; box-shadow: inset 0 3px 8px rgba(2,6,23,0.35);
+      border-color: rgba(59,130,246,0.5);
+    }
+
+    /* icons */
+    .icon svg{filter:drop-shadow(0 6px 18px rgba(0,0,0,0.5))}
+
+    /* footer */
+    footer{margin-top:18px;padding:18px;text-align:center;color:var(--muted);font-size:0.95rem}
+
+    /* responsive */
+    @media (max-width:960px){
+      .grid-3{grid-template-columns:1fr}
+      .hero p{max-width:100%}
+      .nav{flex-direction:column;gap:12px}
+    }
+
+    /* small focus style for accessibility */
+    .feature-card:focus{outline:3px solid rgba(59,130,246,0.18);outline-offset:2px}
+  </style>
+
+  <script>
+    // small helper: set .active class on clicked card to persist blue highlight until navigation
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('.feature-card').forEach(card=>{
+        card.addEventListener('pointerdown', ()=>{ // pointerdown gives immediate tactile feel
+          document.querySelectorAll('.feature-card').forEach(c=>c.classList.remove('active'));
+          card.classList.add('active');
+        });
+      });
+      // optional: listen for keyboard activation (Enter/Space)
+      document.querySelectorAll('.feature-card').forEach(card=>{
+        card.setAttribute('tabindex','0'); // make focusable
+        card.addEventListener('keydown', (e)=>{
+          if(e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            card.click();
+          }
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <nav class="nav" aria-label="Main navigation">
+      <div class="brand" aria-hidden="true">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" style="vertical-align:middle">
+          <path d="M4 12c3-6 13-6 16 0-3 6-13 6-16 0Z" stroke="#bfffcf" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span style="font-size:1.1rem">CropIQ</span> <span class="badge" style="margin-left:8px">Smart Farming with Intelligence</span>
+      </div>
+
+      <div>
+        <a href="predict.html">Predict</a>
+        <a href="optimize.html">Optimize</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="about.html">About</a>
+      </div>
+    </nav>
+
+    <section class="hero" role="banner">
+      <h1>CropIQ — Yield Prediction & Optimization</h1>
+      <p>Predict yields, compare district trends, and get actionable irrigation & fertilizer recommendations — all in one compact </p>
+      <div class="cta-row">
+        <a class="btn-cta" href="predict.html">Start Predicting</a>
+        <a class="btn-ghost" href="dashboard.html">Open Dashboard</a>
+      </div>
+    </section>
+
+    <!-- Clickable feature cards -->
+    <section class="grid grid-3" aria-label="features" style="margin-top:18px">
+      <a href="predict.html" class="feature-card crop" title="Multi-crop support (Paddy, Wheat, Maize, Pulses)">
+        <div class="icon" aria-hidden="true">
+          <!-- leaf / crop icon -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 21c5-6 10-10 18-12" stroke="#9ef6d3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>🌱 Multi-crop support</h3>
+        <p class="small">Paddy, Wheat, Maize, Pulses. Swap datasets to extend crops.</p>
+      </a>
+
+      <a href="dashboard.html" class="feature-card dash" title="District analytics, trends and alerts">
+        <div class="icon" aria-hidden="true">
+          <!-- chart icon -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18" stroke="#bfe6ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 14l3-4 4 6 3-10" stroke="#bfe6ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>📊 Dashboard</h3>
+        <p class="small">District analytics, historical trends, alerts and downloadable PDF reports.</p>
+      </a>
+
+      <a href="optimize.html" class="feature-card opt" title="Irrigation & fertilizer optimization">
+        <div class="icon" aria-hidden="true">
+          <!-- bolt icon -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke="#ffe7b8" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>⚡ Optimization</h3>
+        <p class="small">Irrigation/fertilizer suggestions, scenario profitability and risk scoring.</p>
+      </a>
+    </section>
+
+    <footer>
+      © Pratik Kumar
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Predict — SIH25044</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="assets/js/predict.js"></script>
+  <style>
+    /* 🌌 Animated background */
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
+      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, #06b6d4, #3b82f6, #22c55e, #06b6d4);
+      animation: rotate 18s linear infinite;
+      opacity: 0.06;
+      z-index: -1;
+    }
+    @keyframes rotate { 100% { transform: rotate(360deg); } }
+
+    /* 🔹 Title */
+    h1 {
+      text-align: center;
+      font-size: 2.8rem;
+      margin: 28px 0;
+      font-weight: 900;
+      background: linear-gradient(90deg, #22c55e, #3b82f6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: fadeIn 1s ease-in;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* 💎 Glassmorphism card */
+    .card {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.4s ease, box-shadow 0.4s ease, border 0.4s ease;
+      animation: slideUp 0.8s ease forwards;
+      opacity: 0;
+    }
+    .card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(34,197,94,0.3);
+      border: 1px solid #22c55e;
+    }
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+
+    /* 🔹 Input fields */
+    .input, .select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 0.95rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    }
+    .input:focus, .select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 10px #3b82f655;
+      transform: scale(1.03);
+    }
+    label.small {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+
+    /* 🌈 Animated Button */
+    .btn {
+      background: linear-gradient(90deg, #22c55e, #3b82f6, #06b6d4);
+      background-size: 300% 100%;
+      border: none;
+      padding: 14px 22px;
+      border-radius: 14px;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      width: 100%;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+      animation: gradientMove 4s ease infinite;
+    }
+    .btn:hover {
+      transform: scale(1.07);
+      box-shadow: 0 0 20px rgba(34,197,94,0.5);
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* 📊 Result card highlight */
+    #result {
+      font-size: 1.05rem;
+      font-weight: 600;
+      background: rgba(34,197,94,0.08);
+      border-left: 4px solid #22c55e;
+      position: relative;
+      overflow: hidden;
+    }
+    #result::after {
+      content: "";
+      position: absolute;
+      top:0; left:-50%;
+      width: 50%;
+      height:100%;
+      background: linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+      animation: shine 2.5s infinite;
+    }
+    @keyframes shine {
+      100% { left:120%; }
+    }
+
+    /* Chart container */
+    .chart-card {
+      height: 260px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(59,130,246,0.25);
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* 🔹 Footer */
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      padding: 12px 0;
+    }
+
+    /* Chart theme */
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Navigation -->
+    <nav class="nav" style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;">
+      <div class="brand" style="font-weight:700;font-size:1.2rem;">🌾<span class="badge">Predict</span></div>
+      <div style="display:flex;gap:18px;">
+        <a href="index.html" style="color:#e2e8f0;text-decoration:none;font-weight:500;">Home</a>
+        <a href="dashboard.html" style="color:#e2e8f0;text-decoration:none;font-weight:500;">Dashboard</a>
+        <a href="optimize.html" style="color:#e2e8f0;text-decoration:none;font-weight:500;">Optimize</a>
+      </div>
+    </nav>
+
+    <!-- Title -->
+    <h1>🌱 Smart Yield Prediction</h1>
+
+    <!-- Main content -->
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start">
+      
+      <!-- Form card -->
+      <div class="card">
+        <form id="predictForm" class="form">
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
+            <div>
+              <label class="small">Crop</label>
+              <select name="crop" class="select">
+                <option value="paddy">Paddy</option>
+                <option value="wheat">Wheat</option>
+                <option value="maize">Maize</option>
+                <option value="pulses">Pulses</option>
+              </select>
+            </div>
+            <div>
+              <label class="small">Season</label>
+              <select name="season" class="select">
+                <option value="kharif">Kharif</option>
+                <option value="rabi">Rabi</option>
+              </select>
+            </div>
+            <div>
+              <label class="small">Area (ha)</label>
+              <input class="input" name="area" value="1.0"/>
+            </div>
+            <div>
+              <label class="small">Mandi Price (₹/ton)</label>
+              <input class="input" id="mandi_price" name="mandi_price" value="8000"/>
+            </div>
+            <div>
+              <label class="small">Soil pH</label>
+              <input class="input" name="ph" value="6.5"/>
+            </div>
+            <div>
+              <label class="small">Nitrogen (N)</label>
+              <input class="input" name="n" value="110"/>
+            </div>
+            <div>
+              <label class="small">Phosphorus (P)</label>
+              <input class="input" name="p" value="60"/>
+            </div>
+            <div>
+              <label class="small">Potassium (K)</label>
+              <input class="input" name="k" value="60"/>
+            </div>
+            <div>
+              <label class="small">Avg Temp (°C)</label>
+              <input class="input" name="temp" value="28"/>
+            </div>
+            <div>
+              <label class="small">Rainfall (mm)</label>
+              <input class="input" name="rain" value="200"/>
+            </div>
+          </div>
+          <div style="margin-top:20px">
+            <button class="btn" type="submit">✨ Predict Now</button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Results + chart -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div id="result" class="card">📊 Prediction results will show here...</div>
+        <div class="card chart-card">
+          <canvas id="yieldChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      🌐 for — Govt Agriculture, FoodTech & Rural Development  
+      <br/> ⚙️ Backend: Flask — run <code>backend/app.py</code>
+    </footer>
+  </div>
+
+  <!-- Chart theme -->
+  <script>
+    Chart.defaults.color = "#e2e8f0";
+    Chart.defaults.font.family = "Inter, sans-serif";
+    Chart.defaults.plugins.legend.labels.color = "#94a3b8";
+  </script>
+</body>
+</html>
