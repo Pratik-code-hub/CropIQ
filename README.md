@@ -1,5 +1,7 @@
 🌾 CropIQ — Smart Farming with Intelligence
 
+https://cropiq1.onrender.com/
+
 CropIQ (AgriYield) is a lightweight, production-ready smart farming demo that leverages historical field data, soil and weather features, and machine learning to provide crop yield predictions, trend analytics, and optimization recommendations for irrigation and fertilization.
 
 🚀 Overview
